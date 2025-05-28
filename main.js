@@ -1,3 +1,19 @@
+// === CONFIGURABLE CONSTANTS (Default Values) ===
+let DEFAULT_FONTS = "'JetBrains Mono', 'Consolas', 'Monaco', 'Courier New', monospace";
+let LABELS = {
+    'text-input': 'Text Input:',
+    'number-input': 'Number Input:',
+    'textarea': 'Text Area:',
+    'select': 'Dropdown:',
+    'checkbox': 'Checkbox Option',
+    'label': 'Label Text',
+    'calculated': 'Calculated:',
+    'progress-bar': 'Progress Bar:',
+    'dice-button': '🎲 Roll 1d20',
+    'reference-button': '📚 View Spells',
+    'info-button': 'ℹ️ Show Info'
+};
+
 // Global Variables
 let selectedItem = null;
 let currentPanel = 'explorer';
@@ -67,12 +83,45 @@ let sheetData = {
     }
 };
 
+// --- Apply Default Fonts ---
+function applyFontSetting() {
+    document.body.style.fontFamily = DEFAULT_FONTS;
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     setupDragAndDrop();
     updateComponentCount();
     updateSheetTree();
+    applyFontSetting();
 });
+
+// --- Settings Panel Logic ---
+function showSettingsPanel() {
+    document.getElementById('settings-fonts').value = DEFAULT_FONTS;
+    const tbody = document.getElementById('settings-labels-tbody');
+    tbody.innerHTML = '';
+    for (const [key, value] of Object.entries(LABELS)) {
+        tbody.innerHTML += `
+            <tr>
+                <td>${key}</td>
+                <td>
+                    <input type="text" data-label-key="${key}" value="${value}" style="width: 100%;">
+                </td>
+            </tr>
+        `;
+    }
+    showModal('settings-modal');
+}
+function saveSettings() {
+    DEFAULT_FONTS = document.getElementById('settings-fonts').value;
+    applyFontSetting();
+    document.querySelectorAll('[data-label-key]').forEach(input => {
+        LABELS[input.dataset.labelKey] = input.value;
+    });
+    closeModal('settings-modal');
+    updateStatus('Settings saved');
+}
 
 // Menu Functions
 function showFileMenu() {
@@ -90,7 +139,7 @@ function showViewMenu() {
 }
 
 function showHelpMenu() {
-    alert('TTRPG Character Sheet Builder Help:\n\n• Drag components from sidebar to canvas\n• Select components to edit properties\n• Use calculated fields with rules like: sum([field1],[field2])\n• Link input events: dice-roll, update-calculations\n• Export/Import JSON sheets\n\nKeyboard Shortcuts:\nCtrl+S: Export\nCtrl+O: Import\nDelete: Remove selected');
+    alert('TTRPG Character Sheet Builder Help:\n\n• Drag components from sidebar to canvas\n• Select components to edit properties\n• Use calculated fields with rules like: sum([field1],[field2][...]');
 }
 
 function newSheet() {
@@ -284,6 +333,7 @@ function createComponent(type, container) {
     const id = 'item_' + (++componentCounter);
     const placeholder = container.querySelector('.canvas-placeholder, .container-placeholder');
     if (placeholder) placeholder.remove();
+    const label = LABELS[type] || type;
 
     const componentMap = {
         'row': `<div class="row sheet-item" data-type="row" data-id="${id}" style="border: 2px dashed #ccc; min-height: 60px; padding: 15px; margin: 10px 0; display: flex; flex-wrap: wrap; gap: 10px; position: relative;">
@@ -293,13 +343,19 @@ function createComponent(type, container) {
         </div>
         <div class="container-placeholder" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #999; pointer-events: none;">Row Container</div>
         </div>`,
-        'column': `<div class="column sheet-item" data-type="column" data-id="${id}" style="border: 2px dashed #ccc; min-height: 60px; padding: 15px; margin: 10px 0; display: flex; flex-direction: row; flex-wrap: wrap; gap: 10px; flex: 1; min-width: 200px; position: relative;">`,
+        'column': `<div class="column sheet-item" data-type="column" data-id="${id}" style="border: 2px dashed #ccc; min-height: 60px; padding: 15px; margin: 10px 0; display: flex; flex-direction: column; gap: 10px; position: relative;">
+        <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
+        <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
+        <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
+        </div>
+        <div class="container-placeholder" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #999; pointer-events: none;">Column Container</div>
+        </div>`,
         'text-input': `<div class="sheet-item" data-type="text-input" data-id="${id}" style="border: 1px solid #ddd; padding: 12px; margin: 8px; position: relative;">
         <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
         <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
         <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
         </div>
-        <label>Text Input:</label>
+        <label>${label}</label>
         <input type="text" placeholder="Enter text..." data-json-path="textInput_${id}" data-events="" style="width: 100%; padding: 6px;">
         </div>`,
         'number-input': `<div class="sheet-item" data-type="number-input" data-id="${id}" style="border: 1px solid #ddd; padding: 12px; margin: 8px; position: relative;">
@@ -307,7 +363,7 @@ function createComponent(type, container) {
         <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
         <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
         </div>
-        <label>Number Input:</label>
+        <label>${label}</label>
         <input type="number" placeholder="0" data-json-path="numberInput_${id}" data-events="" style="width: 100%; padding: 6px;">
         </div>`,
         'textarea': `<div class="sheet-item" data-type="textarea" data-id="${id}" style="border: 1px solid #ddd; padding: 12px; margin: 8px; position: relative;">
@@ -315,7 +371,7 @@ function createComponent(type, container) {
         <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
         <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
         </div>
-        <label>Text Area:</label>
+        <label>${label}</label>
         <textarea rows="3" placeholder="Enter multi-line text..." data-json-path="textarea_${id}" data-events="" style="width: 100%; padding: 6px;"></textarea>
         </div>`,
         'select': `<div class="sheet-item" data-type="select" data-id="${id}" style="border: 1px solid #ddd; padding: 12px; margin: 8px; position: relative;">
@@ -323,7 +379,7 @@ function createComponent(type, container) {
         <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
         <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
         </div>
-        <label>Dropdown:</label>
+        <label>${label}</label>
         <select data-json-path="select_${id}" data-events="" style="width: 100%; padding: 6px;">
         <option value="">Select option...</option>
         <option value="option1">Option 1</option>
@@ -335,21 +391,21 @@ function createComponent(type, container) {
         <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
         <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
         </div>
-        <label><input type="checkbox" data-json-path="checkbox_${id}" data-events=""> Checkbox Option</label>
+        <label><input type="checkbox" data-json-path="checkbox_${id}" data-events=""> ${label}</label>
         </div>`,
         'label': `<div class="sheet-item" data-type="label" data-id="${id}" style="border: 1px solid #ddd; padding: 12px; margin: 8px; position: relative;">
         <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
         <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
         <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
         </div>
-        <span data-json-path="label_${id}">Label Text</span>
+        <span data-json-path="label_${id}">${label}</span>
         </div>`,
         'calculated': `<div class="sheet-item" data-type="calculated" data-id="${id}" style="border: 1px solid #ddd; padding: 12px; margin: 8px; position: relative;">
         <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
         <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
         <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
         </div>
-        <label>Calculated:</label>
+        <label>${label}</label>
         <span class="calculated-value" data-calculation="0" data-rules="" style="font-weight: bold; color: #4fc3f7;">0</span>
         </div>`,
         'progress-bar': `<div class="sheet-item" data-type="progress-bar" data-id="${id}" style="border: 1px solid #ddd; padding: 12px; margin: 8px; position: relative;">
@@ -357,7 +413,7 @@ function createComponent(type, container) {
         <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
         <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
         </div>
-        <label>Progress Bar:</label>
+        <label>${label}</label>
         <div style="width: 100%; background: #f0f0f0; border-radius: 4px; height: 16px; overflow: hidden; margin-top: 5px;">
         <div style="height: 100%; background: linear-gradient(90deg, #4fc3f7, #29b6f6); width: 50%; transition: width 0.3s;" data-json-path="progress_${id}"></div>
         </div>
@@ -367,21 +423,21 @@ function createComponent(type, container) {
         <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
         <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
         </div>
-        <button onclick="rollDice('1d20', this)" data-dice="1d20" style="padding: 6px 12px; background: #0e639c; color: white; border: none; border-radius: 4px;">🎲 Roll 1d20</button>
+        <button onclick="rollDice('1d20', this)" data-dice="1d20" style="padding: 6px 12px; background: #0e639c; color: white; border: none; border-radius: 4px;">${label}</button>
         </div>`,
         'reference-button': `<div class="sheet-item" data-type="reference-button" data-id="${id}" style="border: 1px solid #ddd; padding: 12px; margin: 8px; position: relative;">
         <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
         <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
         <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
         </div>
-        <button onclick="showReferenceList('spells', this)" data-reference="spells" style="padding: 6px 12px; background: #0e639c; color: white; border: none; border-radius: 4px;">📚 View Spells</button>
+        <button onclick="showReferenceList('spells', this)" data-reference="spells" style="padding: 6px 12px; background: #0e639c; color: white; border: none; border-radius: 4px;">${label}</button>
         </div>`,
         'info-button': `<div class="sheet-item" data-type="info-button" data-id="${id}" style="border: 1px solid #ddd; padding: 12px; margin: 8px; position: relative;">
         <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
         <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
         <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
         </div>
-        <button onclick="showInfoBox('Information', 'This is sample information content.', this)" data-info-title="Information" data-info-content="This is sample information content." style="padding: 6px 12px; background: #0e639c; color: white; border: none; border-radius: 4px;">ℹ️ Show Info</button>
+        <button onclick="showInfoBox('Information', 'This is sample information content.', this)" data-info-title="Information" data-info-content="This is sample information content." style="padding: 6px 12px; background: #0e639c; color: white; border: none; border-radius: 4px;">${label}</button>
         </div>`
     };
 
@@ -622,26 +678,26 @@ function showItemProperties(item) {
 
     switch (type) {
         case 'text-input':
-            case 'number-input':
-                html += `
-                <div><label>Label:</label><input type="text" value="${item.querySelector('label')?.textContent || ''}" onchange="updateItemProperty('label', this.value)"></div>
-                <div><label>Placeholder:</label><input type="text" value="${item.querySelector('input')?.placeholder || ''}" onchange="updateItemProperty('placeholder', this.value)"></div>
-                <div><label>JSON Path:</label><input type="text" value="${item.querySelector('[data-json-path]')?.dataset.jsonPath || ''}" onchange="updateItemProperty('json-path', this.value)"></div>
-                <div><label>Events:</label><input type="text" value="${item.querySelector('[data-events]')?.dataset.events || ''}" onchange="updateItemProperty('events', this.value)" placeholder="dice-roll, update-calculations"></div>
-                `;
-                break;
-            case 'calculated':
-                html += `
-                <div><label>Label:</label><input type="text" value="${item.querySelector('label')?.textContent || ''}" onchange="updateItemProperty('label', this.value)"></div>
-                <div><label>Rules:</label><textarea rows="4" onchange="updateItemProperty('rules', this.value)" placeholder="sum([field1],[field2])&#10;[strength] + [dexterity]">${item.querySelector('[data-rules]')?.dataset.rules || ''}</textarea></div>
-                `;
-                break;
-            case 'dice-button':
-                html += `
-                <div><label>Button Text:</label><input type="text" value="${item.querySelector('button')?.textContent || ''}" onchange="updateItemProperty('text', this.value)"></div>
-                <div><label>Dice Formula:</label><input type="text" value="${item.querySelector('[data-dice]')?.dataset.dice || ''}" onchange="updateItemProperty('dice', this.value)"></div>
-                `;
-                break;
+        case 'number-input':
+            html += `
+            <div><label>Label:</label><input type="text" value="${item.querySelector('label')?.textContent || ''}" onchange="updateItemProperty('label', this.value)"></div>
+            <div><label>Placeholder:</label><input type="text" value="${item.querySelector('input')?.placeholder || ''}" onchange="updateItemProperty('placeholder', this.value)"></div>
+            <div><label>JSON Path:</label><input type="text" value="${item.querySelector('[data-json-path]')?.dataset.jsonPath || ''}" onchange="updateItemProperty('json-path', this.value)"></div>
+            <div><label>Events:</label><input type="text" value="${item.querySelector('[data-events]')?.dataset.events || ''}" onchange="updateItemProperty('events', this.value)" placeholder="dice-roll,update-calculations"></div>
+            `;
+            break;
+        case 'calculated':
+            html += `
+            <div><label>Label:</label><input type="text" value="${item.querySelector('label')?.textContent || ''}" onchange="updateItemProperty('label', this.value)"></div>
+            <div><label>Rules:</label><textarea rows="4" onchange="updateItemProperty('rules', this.value)" placeholder="sum([field1],[field2])&#10;[strength] + [dexterity]">${item.querySelector('[data-rules]')?.dataset.rules || ''}</textarea></div>
+            `;
+            break;
+        case 'dice-button':
+            html += `
+            <div><label>Button Text:</label><input type="text" value="${item.querySelector('button')?.textContent || ''}" onchange="updateItemProperty('text', this.value)"></div>
+            <div><label>Dice Formula:</label><input type="text" value="${item.querySelector('[data-dice]')?.dataset.dice || ''}" onchange="updateItemProperty('dice', this.value)"></div>
+            `;
+            break;
     }
 
     propertiesContent.innerHTML = html;
