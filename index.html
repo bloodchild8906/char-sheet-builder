@@ -4,7 +4,7 @@
     <meta charset="UTF-16">
     <meta name="viewport" content="initial-scale=1.0">
     <title>TTRPG Character Sheet Builder - Professional IDE</title>
-<link rel="stylesheet" href="style.css"></link>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="ide-container">
@@ -151,6 +151,7 @@
             <div class="status-right">
                 <span onclick="previewSheet()" style="cursor: pointer;">👁️ Preview</span>
                 <span onclick="showGlobalCSS()" style="cursor: pointer;">🎨 CSS</span>
+                <span onclick="showSettingsPanel()" style="cursor: pointer;">⚙️ Settings</span>
             </div>
         </div>
     </div>
@@ -223,8 +224,35 @@
             </div>
         </div>
     </div>
-    
-    <script src="./main.js" ></script>
 
-</body>    
+    <div class="modal" id="settings-modal">
+        <div class="modal-content" style="max-width:700px;">
+            <div class="modal-header">
+                <h3>⚙️ Settings</h3>
+                <button class="modal-close" onclick="closeModal('settings-modal')">×</button>
+            </div>
+            <div>
+                <label style="font-weight: bold;">Fonts (CSS font-family):</label><br>
+                <input id="settings-fonts" type="text" style="width: 100%; margin-bottom: 15px;">
+            </div>
+            <div>
+                <label style="font-weight: bold;">Component Labels:</label>
+                <table style="width:100%; margin-top:4px;">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left;">Component Type</th>
+                            <th style="text-align:left;">Label</th>
+                        </tr>
+                    </thead>
+                    <tbody id="settings-labels-tbody"></tbody>
+                </table>
+            </div>
+            <div style="margin-top:15px; text-align:right;">
+                <button class="btn" onclick="saveSettings()">💾 Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="./main.js"></script>
+</body>
 </html>
