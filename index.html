@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-16">
+    <meta name="viewport" content="initial-scale=1.0">
+    <title>TTRPG Character Sheet Builder - Professional IDE</title>
+<link rel="stylesheet" href="style.css"></link>
+</head>
+<body>
+    <div class="ide-container">
+        <div class="title-bar">
+            <span class="logo">🎮</span>
+            <span>TTRPG Character Sheet Builder - Professional IDE</span>
+        </div>
+
+        <div class="menu-bar">
+            <div class="menu-item" onclick="showFileMenu()">File</div>
+            <div class="menu-item" onclick="showEditMenu()">Edit</div>
+            <div class="menu-item" onclick="showViewMenu()">View</div>
+            <div class="menu-item" onclick="showHelpMenu()">Help</div>
+        </div>
+
+        <div class="main-layout">
+            <div class="activity-bar">
+                <div class="activity-icon active" data-panel="explorer" title="Explorer" onclick="switchPanel('explorer')">📁</div>
+                <div class="activity-icon" data-panel="components" title="Components" onclick="switchPanel('components')">🧩</div>
+                <div class="activity-icon" data-panel="properties" title="Properties" onclick="switchPanel('properties')">⚙️</div>
+                <div class="activity-icon" data-panel="data" title="Data" onclick="switchPanel('data')">📊</div>
+            </div>
+
+            <div class="sidebar" id="sidebar">
+                <div class="sidebar-header" id="sidebar-title">EXPLORER</div>
+                <div class="sidebar-content" id="sidebar-content">
+                    <div class="panel-content" id="explorer-panel">
+                        <div class="component-section">
+                            <div class="component-section-title">Sheet Structure</div>
+                            <div id="sheet-tree">
+                                <div style="color: #858585; font-size: 11px; text-align: center; padding: 20px;">
+                                    No components added yet
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel-content" id="components-panel" style="display: none;">
+                        <div class="component-section">
+                            <div class="component-section-title">Layout</div>
+                            <div class="component-item" draggable="true" data-type="row">
+                                <span class="icon">📋</span>Row Container
+                            </div>
+                            <div class="component-item" draggable="true" data-type="column">
+                                <span class="icon">📊</span>Column Container
+                            </div>
+                        </div>
+
+                        <div class="component-section">
+                            <div class="component-section-title">Form Elements</div>
+                            <div class="component-item" draggable="true" data-type="text-input">
+                                <span class="icon">📝</span>Text Input
+                            </div>
+                            <div class="component-item" draggable="true" data-type="number-input">
+                                <span class="icon">🔢</span>Number Input
+                            </div>
+                            <div class="component-item" draggable="true" data-type="textarea">
+                                <span class="icon">📄</span>Text Area
+                            </div>
+                            <div class="component-item" draggable="true" data-type="select">
+                                <span class="icon">📋</span>Dropdown
+                            </div>
+                            <div class="component-item" draggable="true" data-type="checkbox">
+                                <span class="icon">☑️</span>Checkbox
+                            </div>
+                        </div>
+
+                        <div class="component-section">
+                            <div class="component-section-title">Display</div>
+                            <div class="component-item" draggable="true" data-type="label">
+                                <span class="icon">🏷️</span>Label
+                            </div>
+                            <div class="component-item" draggable="true" data-type="calculated">
+                                <span class="icon">🧮</span>Calculated Field
+                            </div>
+                            <div class="component-item" draggable="true" data-type="progress-bar">
+                                <span class="icon">📊</span>Progress Bar
+                            </div>
+                        </div>
+
+                        <div class="component-section">
+                            <div class="component-section-title">Interactive</div>
+                            <div class="component-item" draggable="true" data-type="dice-button">
+                                <span class="icon">🎲</span>Dice Roll Button
+                            </div>
+                            <div class="component-item" draggable="true" data-type="reference-button">
+                                <span class="icon">📚</span>Reference List Button
+                            </div>
+                            <div class="component-item" draggable="true" data-type="info-button">
+                                <span class="icon">ℹ️</span>Info Box Button
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel-content" id="properties-panel" style="display: none;">
+                        <div id="properties-content">
+                            <div style="color: #858585; font-size: 11px; text-align: center; padding: 20px;">
+                                Select an item to edit its properties
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel-content" id="data-panel" style="display: none;">
+                        <div class="component-section">
+                            <div class="component-section-title">Sheet Data</div>
+                            <button class="btn" onclick="showDataEditor()" style="width: 100%; margin-bottom: 10px;">
+                                📊 Edit JSON Data
+                            </button>
+                            <button class="btn btn-secondary" onclick="exportSheet()" style="width: 100%; margin-bottom: 10px;">
+                                💾 Export Sheet
+                            </button>
+                            <button class="btn btn-secondary" onclick="importSheet()" style="width: 100%;">
+                                📁 Import Sheet
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="editor-area">
+                <div class="tab-bar">
+                    <div class="editor-tab active">
+                        <span>📋 Character Sheet</span>
+                        <span class="close-btn" onclick="closeTab(this)">×</span>
+                    </div>
+                </div>
+
+                <div class="canvas-container">
+                    <div class="canvas" id="canvas">
+                        <div class="canvas-placeholder">
+                            <h3>Start Building Your Character Sheet</h3>
+                            <p>Drag components from the sidebar to begin</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-left">
+                <span id="component-count">Components: 0</span>
+                <span id="sheet-status">Ready</span>
+            </div>
+            <div class="status-right">
+                <span onclick="previewSheet()" style="cursor: pointer;">👁️ Preview</span>
+                <span onclick="showGlobalCSS()" style="cursor: pointer;">🎨 CSS</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="dice-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🎲 Dice Roll Result</h3>
+                <button class="modal-close" onclick="closeModal('dice-modal')">×</button>
+            </div>
+            <div class="dice-result" id="dice-result"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="reference-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📚 Reference List</h3>
+                <button class="modal-close" onclick="closeModal('reference-modal')">×</button>
+            </div>
+            <div class="reference-list" id="reference-list"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="info-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="info-title">ℹ️ Information</h3>
+                <button class="modal-close" onclick="closeModal('info-modal')">×</button>
+            </div>
+            <div id="info-content"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="preview-modal">
+        <div class="modal-content" style="max-width: 95%; max-height: 95%;">
+            <div class="modal-header">
+                <h3>👁️ Sheet Preview</h3>
+                <button class="modal-close" onclick="closeModal('preview-modal')">×</button>
+            </div>
+            <div id="preview-content" style="background: white; color: black; padding: 20px; border-radius: 6px;"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="data-modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3>📊 Sheet Data Editor</h3>
+                <button class="modal-close" onclick="closeModal('data-modal')">×</button>
+            </div>
+            <textarea class="code-editor" id="data-editor" placeholder="Edit your sheet's JSON data here..."></textarea>
+            <div style="margin-top: 15px; display: flex; gap: 10px;">
+                <button class="btn" onclick="saveSheetData()">💾 Save Changes</button>
+                <button class="btn btn-secondary" onclick="formatJSON()">✨ Format JSON</button>
+                <button class="btn btn-secondary" onclick="validateJSON()">✓ Validate</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="css-modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3>🎨 Global CSS Styles</h3>
+                <button class="modal-close" onclick="closeModal('css-modal')">×</button>
+            </div>
+            <textarea class="code-editor" id="css-editor" placeholder="/* Add your custom CSS styles here */"></textarea>
+            <div style="margin-top: 15px; display: flex; gap: 10px;">
+                <button class="btn" onclick="applyGlobalCSS()">🎨 Apply Styles</button>
+                <button class="btn btn-secondary" onclick="resetCSS()">🔄 Reset</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="./main.js" ></script>
+
+</body>    
+</html>
