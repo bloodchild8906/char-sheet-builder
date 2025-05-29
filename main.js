@@ -1,8 +1,5 @@
 'use strict';
 
-// ===================================================================
-// CONFIGURATION AND CONSTANTS
-// ===================================================================
 
 var CONFIG = {
     VERSION: '3.2.0',
@@ -73,10 +70,6 @@ var LABELS = {
     slider: 'Slider Input',
     rating: 'Star Rating'
 };
-
-// ===================================================================
-// ENHANCED APPLICATION STATE MANAGEMENT (ES5)
-// ===================================================================
 
 function AppState() {
     this.selectedItem = null;
@@ -746,55 +739,174 @@ function safeStringify(obj, replacer, space) {
     }
 }
 
-// Example: Application Initialization
-document.addEventListener('DOMContentLoaded', initializeAppSafely);
-
-function initializeAppSafely() {
-    try {
-        initializeApp();
-    } catch (error) {
-        if (window.appState) appState.logError('App failed to initialize', error);
-        alert('Failed to initialize application. See console for details.');
-    }
+// --- Utility: DOM Ready ---
+function onReady(fn) {
+    if (document.readyState !== 'loading') fn();
+    else document.addEventListener('DOMContentLoaded', fn);
 }
 
-function initializeApp() {
-    if (!window.appState) window.appState = new AppState();
-    appState.showNotification('App initialized!', 'success');
+// --- Menu Dropdowns ---
+function createDropdown(menuEl, items) {
+    let dropdown = document.createElement('div');
+    dropdown.className = 'dropdown-menu';
+    dropdown.tabIndex = -1;
+    dropdown.style.position = 'absolute';
+    dropdown.style.top = menuEl.offsetHeight + 'px';
+    dropdown.style.left = '0px';
+    dropdown.style.background = '#23272e';
+    dropdown.style.color = '#fff';
+    dropdown.style.border = '1px solid #444';
+    dropdown.style.borderRadius = '4px';
+    dropdown.style.minWidth = '140px';
+    dropdown.style.zIndex = 1000;
+    dropdown.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+    dropdown.style.fontSize = '14px';
+    dropdown.style.padding = '4px 0';
+
+    items.forEach(item => {
+        let el = document.createElement('div');
+        el.className = 'dropdown-item';
+        el.style.padding = '6px 18px';
+        el.style.cursor = 'pointer';
+        el.innerHTML = (item.icon ? item.icon + ' ' : '') + item.label;
+        el.addEventListener('click', e => {
+            e.stopPropagation();
+            dropdown.remove();
+            item.action && item.action();
+        });
+        dropdown.appendChild(el);
+    });
+
+    // Remove dropdown on blur or click outside
+    function removeDropdown(e) {
+        if (!dropdown.contains(e.target) && e.target !== menuEl) {
+            dropdown.remove();
+            document.removeEventListener('mousedown', removeDropdown);
+        }
+    }
+    document.addEventListener('mousedown', removeDropdown);
+
+    menuEl.appendChild(dropdown);
+    dropdown.focus();
 }
 
-// EXAMPLE: Simple event handler for notifications
-window.showNotification = function(msg, type) {
-    if (typeof type === 'undefined') type = 'info';
-    if (window.appState) appState.showNotification(msg, type);
-};
+// --- Menu Actions ---
+function setupMenus() {
+    const menuBar = document.querySelector('.menu-bar');
+    if (!menuBar) return;
+    menuBar.querySelectorAll('.menu-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const menu = this.getAttribute('data-menu');
+            if (menu === 'file') { /* show file menu dropdown */ }
+            if (menu === 'edit') { /* show edit menu dropdown */ }
+            if (menu === 'view') { /* show view menu dropdown */ }
+            if (menu === 'help') { /* show help menu dropdown */ }
+        });
+        item.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') this.click();
+        });
+    });
+}
 
-// EXAMPLE: Expose a safe API for extensions
-window.TTRPGBuilder = {
-    version: CONFIG.VERSION,
-    getData: function() { return window.appState ? appState.deepClone(appState.sheetData.data) : {}; },
-    showNotification: function(msg, type) { return window.showNotification(msg, type); },
-    sanitizeHTML: function(html) { return window.appState ? appState.sanitizeHTML(html) : html; }
-};
+function setupActivityBar() {
+    document.querySelectorAll('.activity-icon').forEach(icon => {
+        icon.addEventListener('click', function() {
+            switchPanel(this.getAttribute('data-panel'));
+        });
+        icon.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') this.click();
+        });
+    });
+}
 
-window.switchPanel = function(panel) {
-    var i, p, icon;
-    var panels = document.querySelectorAll('.panel-content');
-    for (i = 0; i < panels.length; i++) {
-        p = panels[i];
-        p.style.display = 'none';
-    }
-    var icons = document.querySelectorAll('.activity-icon');
-    for (i = 0; i < icons.length; i++) {
-        icon = icons[i];
-        icon.classList.remove('active');
-    }
-    var selectedPanel = document.getElementById(panel + '-panel');
-    if (selectedPanel) selectedPanel.style.display = '';
-    var sidebarTitle = document.getElementById('sidebar-title');
-    if (sidebarTitle) sidebarTitle.textContent = panel.toUpperCase();
-    var activeIcon = document.querySelector('.activity-icon[data-panel="' + panel + '"]');
-    if (activeIcon) activeIcon.classList.add('active');
-};
+function setupStatusBar() {
+    document.querySelectorAll('.status-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const action = this.getAttribute('data-action');
+            if (action === 'preview') previewSheet();
+            if (action === 'css') showGlobalCSS();
+            if (action === 'settings') showSettingsPanel();
+        });
+        btn.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') this.click();
+        });
+    });
+}
 
-// (Continued in Part 2...)
+function setupModalCloses() {
+    document.querySelectorAll('.modal-close').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.getAttribute('data-close');
+            closeModal(id);
+        });
+        btn.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') this.click();
+        });
+    });
+}
+
+function setupDataPanel() {
+    document.querySelectorAll('[data-action="show-data-editor"]').forEach(btn => {
+        btn.addEventListener('click', showDataEditor);
+    });
+    document.querySelectorAll('[data-action="export-sheet"]').forEach(btn => {
+        btn.addEventListener('click', exportSheet);
+    });
+    document.querySelectorAll('[data-action="import-sheet"]').forEach(btn => {
+        btn.addEventListener('click', importSheet);
+    });
+    document.querySelectorAll('[data-action="save-sheet-data"]').forEach(btn => {
+        btn.addEventListener('click', saveSheetData);
+    });
+    document.querySelectorAll('[data-action="format-json"]').forEach(btn => {
+        btn.addEventListener('click', formatJSON);
+    });
+    document.querySelectorAll('[data-action="validate-json"]').forEach(btn => {
+        btn.addEventListener('click', validateJSON);
+    });
+}
+
+function setupCSSPanel() {
+    document.querySelectorAll('[data-action="apply-global-css"]').forEach(btn => {
+        btn.addEventListener('click', applyGlobalCSS);
+    });
+    document.querySelectorAll('[data-action="reset-css"]').forEach(btn => {
+        btn.addEventListener('click', resetCSS);
+    });
+}
+
+function setupSettingsPanel() {
+    document.querySelectorAll('[data-action="save-settings"]').forEach(btn => {
+        btn.addEventListener('click', saveSettings);
+    });
+}
+
+function setupTabs() {
+    document.querySelectorAll('[data-action="close-tab"]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            closeTab(this);
+        });
+        btn.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') this.click();
+        });
+    });
+}
+
+// --- Initialize Everything ---
+onReady(function() {
+    setupMenus();
+    setupActivityBar();
+    setupStatusBar();
+    setupModalCloses();
+    setupDataPanel();
+    setupCSSPanel();
+    setupSettingsPanel();
+    setupTabs();
+    // ...other initialization...
+});
+
+// --- Export for legacy support ---
+window.previewSheet = previewSheet;
+window.showGlobalCSS = showGlobalCSS;
+window.showSettingsPanel = showSettingsPanel;
+window.closeModal = closeModal;

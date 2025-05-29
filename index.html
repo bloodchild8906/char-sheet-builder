@@ -14,18 +14,18 @@
         </div>
 
         <div class="menu-bar">
-            <div class="menu-item" onclick="showFileMenu()">File</div>
-            <div class="menu-item" onclick="showEditMenu()">Edit</div>
-            <div class="menu-item" onclick="showViewMenu()">View</div>
-            <div class="menu-item" onclick="showHelpMenu()">Help</div>
+            <div class="menu-item" data-menu="file" tabindex="0" aria-label="File menu">File</div>
+            <div class="menu-item" data-menu="edit" tabindex="0" aria-label="Edit menu">Edit</div>
+            <div class="menu-item" data-menu="view" tabindex="0" aria-label="View menu">View</div>
+            <div class="menu-item" data-menu="help" tabindex="0" aria-label="Help menu">Help</div>
         </div>
 
         <div class="main-layout">
             <div class="activity-bar">
-                <div class="activity-icon active" data-panel="explorer" title="Explorer" onclick="switchPanel('explorer')">📁</div>
-                <div class="activity-icon" data-panel="components" title="Components" onclick="switchPanel('components')">🧩</div>
-                <div class="activity-icon" data-panel="properties" title="Properties" onclick="switchPanel('properties')">⚙️</div>
-                <div class="activity-icon" data-panel="data" title="Data" onclick="switchPanel('data')">📊</div>
+                <div class="activity-icon active" data-panel="explorer" title="Explorer" tabindex="0">📁</div>
+                <div class="activity-icon" data-panel="components" title="Components" tabindex="0">🧩</div>
+                <div class="activity-icon" data-panel="properties" title="Properties" tabindex="0">⚙️</div>
+                <div class="activity-icon" data-panel="data" title="Data" tabindex="0">📊</div>
             </div>
 
             <div class="sidebar" id="sidebar">
@@ -110,13 +110,13 @@
                     <div class="panel-content" id="data-panel" style="display: none;">
                         <div class="component-section">
                             <div class="component-section-title">Sheet Data</div>
-                            <button class="btn" onclick="showDataEditor()" style="width: 100%; margin-bottom: 10px;">
+                            <button class="btn" data-action="show-data-editor" style="width: 100%; margin-bottom: 10px;">
                                 📊 Edit JSON Data
                             </button>
-                            <button class="btn btn-secondary" onclick="exportSheet()" style="width: 100%; margin-bottom: 10px;">
+                            <button class="btn btn-secondary" data-action="export-sheet" style="width: 100%; margin-bottom: 10px;">
                                 💾 Export Sheet
                             </button>
-                            <button class="btn btn-secondary" onclick="importSheet()" style="width: 100%;">
+                            <button class="btn btn-secondary" data-action="import-sheet" style="width: 100%;">
                                 📁 Import Sheet
                             </button>
                         </div>
@@ -128,7 +128,7 @@
                 <div class="tab-bar">
                     <div class="editor-tab active">
                         <span>📋 Character Sheet</span>
-                        <span class="close-btn" onclick="closeTab(this)">×</span>
+                        <span class="close-btn" data-action="close-tab" tabindex="0" aria-label="Close tab">×</span>
                     </div>
                 </div>
 
@@ -149,18 +149,19 @@
                 <span id="sheet-status">Ready</span>
             </div>
             <div class="status-right">
-                <span onclick="previewSheet()" style="cursor: pointer;">👁️ Preview</span>
-                <span onclick="showGlobalCSS()" style="cursor: pointer;">🎨 CSS</span>
-                <span onclick="showSettingsPanel()" style="cursor: pointer;">⚙️ Settings</span>
+                <span class="status-btn" data-action="preview" tabindex="0" aria-label="Preview">👁️ Preview</span>
+                <span class="status-btn" data-action="css" tabindex="0" aria-label="CSS">🎨 CSS</span>
+                <span class="status-btn" data-action="settings" tabindex="0" aria-label="Settings">⚙️ Settings</span>
             </div>
         </div>
     </div>
 
+    <!-- Modals: all close buttons use data-close attribute -->
     <div class="modal" id="dice-modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3>🎲 Dice Roll Result</h3>
-                <button class="modal-close" onclick="closeModal('dice-modal')">×</button>
+                <button class="modal-close" data-close="dice-modal" tabindex="0" aria-label="Close dice modal">×</button>
             </div>
             <div class="dice-result" id="dice-result"></div>
         </div>
@@ -170,7 +171,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3>📚 Reference List</h3>
-                <button class="modal-close" onclick="closeModal('reference-modal')">×</button>
+                <button class="modal-close" data-close="reference-modal" tabindex="0" aria-label="Close reference modal">×</button>
             </div>
             <div class="reference-list" id="reference-list"></div>
         </div>
@@ -180,7 +181,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 id="info-title">ℹ️ Information</h3>
-                <button class="modal-close" onclick="closeModal('info-modal')">×</button>
+                <button class="modal-close" data-close="info-modal" tabindex="0" aria-label="Close info modal">×</button>
             </div>
             <div id="info-content"></div>
         </div>
@@ -190,7 +191,7 @@
         <div class="modal-content" style="max-width: 95%; max-height: 95%;">
             <div class="modal-header">
                 <h3>👁️ Sheet Preview</h3>
-                <button class="modal-close" onclick="closeModal('preview-modal')">×</button>
+                <button class="modal-close" data-close="preview-modal" tabindex="0" aria-label="Close preview modal">×</button>
             </div>
             <div id="preview-content" style="background: white; color: black; padding: 20px; border-radius: 6px;"></div>
         </div>
@@ -200,13 +201,13 @@
         <div class="modal-content" style="max-width: 800px;">
             <div class="modal-header">
                 <h3>📊 Sheet Data Editor</h3>
-                <button class="modal-close" onclick="closeModal('data-modal')">×</button>
+                <button class="modal-close" data-close="data-modal" tabindex="0" aria-label="Close data modal">×</button>
             </div>
             <textarea class="code-editor" id="data-editor" placeholder="Edit your sheet's JSON data here..."></textarea>
             <div style="margin-top: 15px; display: flex; gap: 10px;">
-                <button class="btn" onclick="saveSheetData()">💾 Save Changes</button>
-                <button class="btn btn-secondary" onclick="formatJSON()">✨ Format JSON</button>
-                <button class="btn btn-secondary" onclick="validateJSON()">✓ Validate</button>
+                <button class="btn" data-action="save-sheet-data">💾 Save Changes</button>
+                <button class="btn btn-secondary" data-action="format-json">✨ Format JSON</button>
+                <button class="btn btn-secondary" data-action="validate-json">✓ Validate</button>
             </div>
         </div>
     </div>
@@ -215,12 +216,12 @@
         <div class="modal-content" style="max-width: 800px;">
             <div class="modal-header">
                 <h3>🎨 Global CSS Styles</h3>
-                <button class="modal-close" onclick="closeModal('css-modal')">×</button>
+                <button class="modal-close" data-close="css-modal" tabindex="0" aria-label="Close CSS modal">×</button>
             </div>
             <textarea class="code-editor" id="css-editor" placeholder="/* Add your custom CSS styles here */"></textarea>
             <div style="margin-top: 15px; display: flex; gap: 10px;">
-                <button class="btn" onclick="applyGlobalCSS()">🎨 Apply Styles</button>
-                <button class="btn btn-secondary" onclick="resetCSS()">🔄 Reset</button>
+                <button class="btn" data-action="apply-global-css">🎨 Apply Styles</button>
+                <button class="btn btn-secondary" data-action="reset-css">🔄 Reset</button>
             </div>
         </div>
     </div>
@@ -229,7 +230,7 @@
         <div class="modal-content" style="max-width:700px;">
             <div class="modal-header">
                 <h3>⚙️ Settings</h3>
-                <button class="modal-close" onclick="closeModal('settings-modal')">×</button>
+                <button class="modal-close" data-close="settings-modal" tabindex="0" aria-label="Close settings modal">×</button>
             </div>
             <div>
                 <label style="font-weight: bold;">Fonts (CSS font-family):</label><br>
@@ -248,7 +249,7 @@
                 </table>
             </div>
             <div style="margin-top:15px; text-align:right;">
-                <button class="btn" onclick="saveSettings()">💾 Save</button>
+                <button class="btn" data-action="save-settings">💾 Save</button>
             </div>
         </div>
     </div>
