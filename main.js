@@ -1,4 +1,4 @@
-// === CONFIGURABLE CONSTANTS (Default Values) ===
+'// === CONFIGURABLE CONSTANTS (Default Values) ===
 let DEFAULT_FONTS = "'JetBrains Mono', 'Consolas', 'Monaco', 'Courier New', monospace";
 let LABELS = {
     'text-input': 'Text Input:',
@@ -139,7 +139,7 @@ function showViewMenu() {
 }
 
 function showHelpMenu() {
-    alert('TTRPG Character Sheet Builder Help:\n\n• Drag components from sidebar to canvas\n• Select components to edit properties\n• Use calculated fields with rules like: sum([field1],[field2][...]');
+    alert('TTRPG Character Sheet Builder Help:\n\n• Drag components from sidebar to canvas\n• Select components to edit properties\n• Use calculated fields with rules like: sum([field1],[field2])\n• Save and export sheets for your game!');
 }
 
 function newSheet() {
@@ -326,9 +326,7 @@ function findDropTarget(element) {
         element = element.parentElement;
     }
     return null;
-}
-
-// Component Creation
+}// Component Creation
 function createComponent(type, container) {
     const id = 'item_' + (++componentCounter);
     const placeholder = container.querySelector('.canvas-placeholder, .container-placeholder');
@@ -336,108 +334,110 @@ function createComponent(type, container) {
     const label = LABELS[type] || type;
 
     const componentMap = {
-        'row': `<div class="row sheet-item" data-type="row" data-id="${id}" style="border: 2px dashed #ccc; min-height: 60px; padding: 15px; margin: 10px 0; display: flex; flex-wrap: wrap; gap: 10px; position: relative;">
-        <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
-        <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
-        <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
-        </div>
-        <div class="container-placeholder" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #999; pointer-events: none;">Row Container</div>
+        // Row: vertical (column direction)
+        'row': `<div class="row sheet-item" data-type="row" data-id="${id}" style="border: 2px dashed #ccc; min-height: 60px; padding: 15px; margin: 10px 0; display: flex; flex-direction: column; gap: 16px; position: relative;">
+            <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
+                <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
+                <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
+            </div>
+            <div class="container-placeholder" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #999; pointer-events: none;">Row Container</div>
         </div>`,
-        'column': `<div class="column sheet-item" data-type="column" data-id="${id}" style="border: 2px dashed #ccc; min-height: 60px; padding: 15px; margin: 10px 0; display: flex; flex-direction: column; gap: 10px; position: relative;">
-        <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
-        <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
-        <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
-        </div>
-        <div class="container-placeholder" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #999; pointer-events: none;">Column Container</div>
+        // Column: horizontal (row direction)
+        'column': `<div class="column sheet-item" data-type="column" data-id="${id}" style="border: 2px dashed #ccc; min-height: 60px; padding: 15px; margin: 10px 0; display: flex; flex-direction: row; gap: 16px; position: relative;">
+            <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
+                <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
+                <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
+            </div>
+            <div class="container-placeholder" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #999; pointer-events: none;">Column Container</div>
         </div>`,
         'text-input': `<div class="sheet-item" data-type="text-input" data-id="${id}" style="border: 1px solid #ddd; padding: 12px; margin: 8px; position: relative;">
-        <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
-        <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
-        <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
-        </div>
-        <label>${label}</label>
-        <input type="text" placeholder="Enter text..." data-json-path="textInput_${id}" data-events="" style="width: 100%; padding: 6px;">
+            <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
+                <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
+                <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
+            </div>
+            <label>${label}</label>
+            <input type="text" placeholder="Enter text..." data-json-path="textInput_${id}" data-events="" style="width: 100%; padding: 6px;">
         </div>`,
         'number-input': `<div class="sheet-item" data-type="number-input" data-id="${id}" style="border: 1px solid #ddd; padding: 12px; margin: 8px; position: relative;">
-        <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
-        <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
-        <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
-        </div>
-        <label>${label}</label>
-        <input type="number" placeholder="0" data-json-path="numberInput_${id}" data-events="" style="width: 100%; padding: 6px;">
+            <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
+                <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
+                <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
+            </div>
+            <label>${label}</label>
+            <input type="number" placeholder="0" data-json-path="numberInput_${id}" data-events="" style="width: 100%; padding: 6px;">
         </div>`,
         'textarea': `<div class="sheet-item" data-type="textarea" data-id="${id}" style="border: 1px solid #ddd; padding: 12px; margin: 8px; position: relative;">
-        <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
-        <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
-        <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
-        </div>
-        <label>${label}</label>
-        <textarea rows="3" placeholder="Enter multi-line text..." data-json-path="textarea_${id}" data-events="" style="width: 100%; padding: 6px;"></textarea>
+            <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
+                <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
+                <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
+            </div>
+            <label>${label}</label>
+            <textarea rows="3" placeholder="Enter multi-line text..." data-json-path="textarea_${id}" data-events="" style="width: 100%; padding: 6px;"></textarea>
         </div>`,
         'select': `<div class="sheet-item" data-type="select" data-id="${id}" style="border: 1px solid #ddd; padding: 12px; margin: 8px; position: relative;">
-        <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
-        <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
-        <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
-        </div>
-        <label>${label}</label>
-        <select data-json-path="select_${id}" data-events="" style="width: 100%; padding: 6px;">
-        <option value="">Select option...</option>
-        <option value="option1">Option 1</option>
-        <option value="option2">Option 2</option>
-        </select>
+            <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
+                <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
+                <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
+            </div>
+            <label>${label}</label>
+            <select data-json-path="select_${id}" data-events="" style="width: 100%; padding: 6px;">
+                <option value="">Select option...</option>
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+            </select>
         </div>`,
         'checkbox': `<div class="sheet-item" data-type="checkbox" data-id="${id}" style="border: 1px solid #ddd; padding: 12px; margin: 8px; position: relative;">
-        <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
-        <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
-        <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
-        </div>
-        <label><input type="checkbox" data-json-path="checkbox_${id}" data-events=""> ${label}</label>
+            <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
+                <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
+                <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
+            </div>
+            <label><input type="checkbox" data-json-path="checkbox_${id}" data-events=""> ${label}</label>
         </div>`,
         'label': `<div class="sheet-item" data-type="label" data-id="${id}" style="border: 1px solid #ddd; padding: 12px; margin: 8px; position: relative;">
-        <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
-        <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
-        <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
-        </div>
-        <span data-json-path="label_${id}">${label}</span>
+            <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
+                <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
+                <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
+            </div>
+            <span data-json-path="label_${id}">${label}</span>
         </div>`,
         'calculated': `<div class="sheet-item" data-type="calculated" data-id="${id}" style="border: 1px solid #ddd; padding: 12px; margin: 8px; position: relative;">
-        <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
-        <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
-        <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
-        </div>
-        <label>${label}</label>
-        <span class="calculated-value" data-calculation="0" data-rules="" style="font-weight: bold; color: #4fc3f7;">0</span>
+            <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
+                <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
+                <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
+            </div>
+            <label>${label}</label>
+            <span class="calculated-value" data-calculation="0" data-rules="" style="font-weight: bold; color: #4fc3f7;">0</span>
         </div>`,
         'progress-bar': `<div class="sheet-item" data-type="progress-bar" data-id="${id}" style="border: 1px solid #ddd; padding: 12px; margin: 8px; position: relative;">
-        <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
-        <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
-        <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
-        </div>
-        <label>${label}</label>
-        <div style="width: 100%; background: #f0f0f0; border-radius: 4px; height: 16px; overflow: hidden; margin-top: 5px;">
-        <div style="height: 100%; background: linear-gradient(90deg, #4fc3f7, #29b6f6); width: 50%; transition: width 0.3s;" data-json-path="progress_${id}"></div>
-        </div>
+            <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
+                <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
+                <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
+            </div>
+            <label>${label}</label>
+            <div style="width: 100%; background: #f0f0f0; border-radius: 4px; height: 16px; overflow: hidden; margin-top: 5px;">
+                <div style="height: 100%; background: linear-gradient(90deg, #4fc3f7, #29b6f6); width: 50%; transition: width 0.3s;" data-json-path="progress_${id}"></div>
+            </div>
         </div>`,
         'dice-button': `<div class="sheet-item" data-type="dice-button" data-id="${id}" style="border: 1px solid #ddd; padding: 12px; margin: 8px; position: relative;">
-        <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
-        <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
-        <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
-        </div>
-        <button onclick="rollDice('1d20', this)" data-dice="1d20" style="padding: 6px 12px; background: #0e639c; color: white; border: none; border-radius: 4px;">${label}</button>
+            <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
+                <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
+                <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
+            </div>
+            <button onclick="rollDice('1d20', this)" data-dice="1d20" style="padding: 6px 12px; background: #0e639c; color: white; border: none; border-radius: 4px;">${label}</button>
         </div>`,
         'reference-button': `<div class="sheet-item" data-type="reference-button" data-id="${id}" style="border: 1px solid #ddd; padding: 12px; margin: 8px; position: relative;">
-        <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
-        <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
-        <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
-        </div>
-        <button onclick="showReferenceList('spells', this)" data-reference="spells" style="padding: 6px 12px; background: #0e639c; color: white; border: none; border-radius: 4px;">${label}</button>
+            <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
+                <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
+                <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
+            </div>
+            <button onclick="showReferenceList('spells', this)" data-reference="spells" style="padding: 6px 12px; background: #0e639c; color: white; border: none; border-radius: 4px;">${label}</button>
         </div>`,
         'info-button': `<div class="sheet-item" data-type="info-button" data-id="${id}" style="border: 1px solid #ddd; padding: 12px; margin: 8px; position: relative;">
-        <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
-        <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
-        <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
-        </div>
-        <button onclick="showInfoBox('Information', 'This is sample information content.', this)" data-info-title="Information" data-info-content="This is sample information content." style="padding: 6px 12px; background: #0e639c; color: white; border: none; border-radius: 4px;">${label}</button>
+            <div class="item-controls" style="position: absolute; top: -8px; right: -8px; display: none; gap: 4px;">
+                <button onclick="selectItem(this.parentElement.parentElement)">⚙</button>
+                <button onclick="deleteItem(this.parentElement.parentElement)">×</button>
+            </div>
+            <button onclick="showInfoBox('Information', 'This is sample information content.', this)" data-info-title="Information" data-info-content="This is sample information content." style="padding: 6px 12px; background: #0e639c; color: white; border: none; border-radius: 4px;">${label}</button>
         </div>`
     };
 
@@ -479,7 +479,6 @@ function setupContainerDragDrop(container) {
         }
     });
 }
-
 function setupInputListeners(element) {
     const inputs = element.querySelectorAll('[data-json-path]');
     inputs.forEach(input => {
@@ -500,16 +499,15 @@ function setupInputListeners(element) {
             updateStatus('Data updated');
         });
 
-        input.addEventListener('input',
-            function() {
-                const path = this.dataset.jsonPath;
-                if (this.type === 'number') {
-                    sheetData.data[path] = parseFloat(this.value) || 0;
-                } else if (this.type !== 'checkbox') {
-                    sheetData.data[path] = this.value;
-                }
-                updateCalculatedFields();
-            });
+        input.addEventListener('input', function() {
+            const path = this.dataset.jsonPath;
+            if (this.type === 'number') {
+                sheetData.data[path] = parseFloat(this.value) || 0;
+            } else if (this.type !== 'checkbox') {
+                sheetData.data[path] = this.value;
+            }
+            updateCalculatedFields();
+        });
     });
 }
 
@@ -519,11 +517,10 @@ function setupItemHover(element) {
         if (controls) controls.style.display = 'flex';
     });
 
-    element.addEventListener('mouseleave',
-        function() {
-            const controls = this.querySelector('.item-controls');
-            if (controls) controls.style.display = 'none';
-        });
+    element.addEventListener('mouseleave', function() {
+        const controls = this.querySelector('.item-controls');
+        if (controls) controls.style.display = 'none';
+    });
 }
 
 function executeInputEvents(events, inputElement, jsonPath) {
@@ -546,8 +543,7 @@ function executeInputEvents(events, inputElement, jsonPath) {
             }
         });
     } catch (error) {
-        console.error('Error executing input events:',
-            error);
+        console.error('Error executing input events:', error);
     }
 }
 
@@ -630,7 +626,7 @@ function getFieldValue(fieldName) {
 
     const element = document.querySelector(`[data-json-path="${fieldName}"]`);
     if (element) {
-        return element.type === 'checkbox' ? (element.checked ? 1: 0): (element.value || 0);
+        return element.type === 'checkbox' ? (element.checked ? 1 : 0) : (element.value || 0);
     }
     return 0;
 }
@@ -683,7 +679,7 @@ function showItemProperties(item) {
             <div><label>Label:</label><input type="text" value="${item.querySelector('label')?.textContent || ''}" onchange="updateItemProperty('label', this.value)"></div>
             <div><label>Placeholder:</label><input type="text" value="${item.querySelector('input')?.placeholder || ''}" onchange="updateItemProperty('placeholder', this.value)"></div>
             <div><label>JSON Path:</label><input type="text" value="${item.querySelector('[data-json-path]')?.dataset.jsonPath || ''}" onchange="updateItemProperty('json-path', this.value)"></div>
-            <div><label>Events:</label><input type="text" value="${item.querySelector('[data-events]')?.dataset.events || ''}" onchange="updateItemProperty('events', this.value)" placeholder="dice-roll,update-calculations"></div>
+            <div><label>Events:</label><input type="text" value="${item.querySelector('[data-events]')?.dataset.events || ''}" onchange="updateItemProperty('events', this.value)" placeholder="dice-roll, update-calculations"></div>
             `;
             break;
         case 'calculated':
@@ -723,7 +719,6 @@ function updateItemProperty(property, value) {
             const jsonElement = selectedItem.querySelector('[data-json-path]');
             if (jsonElement) jsonElement.dataset.jsonPath = value;
             break;
-
         case 'events':
             const eventElement = selectedItem.querySelector('[data-events]');
             if (eventElement) {
@@ -758,7 +753,7 @@ function rollDice(formula, button) {
 
         const numDice = parseInt(match[1]);
         const diceSize = parseInt(match[2]);
-        const modifier = match[3] ? parseInt(match[3]): 0;
+        const modifier = match[3] ? parseInt(match[3]) : 0;
 
         let total = 0;
         let rolls = [];
@@ -775,7 +770,7 @@ function rollDice(formula, button) {
         <div style="font-size: 32px; margin-bottom: 10px;">${total}</div>
         <div style="font-size: 14px;">
         Formula: ${formula}<br>
-        Rolls: ${rolls.join(', ')}${modifier !== 0 ? ` + ${modifier}`: ''}
+        Rolls: ${rolls.join(', ')}${modifier !== 0 ? ` + ${modifier}` : ''}
         </div>
         `;
 
@@ -800,7 +795,7 @@ function showReferenceList(type, button) {
         div.style.cssText = 'border: 1px solid #ddd; padding: 12px; margin: 8px 0; cursor: pointer; border-radius: 4px;';
         div.innerHTML = `
         <h4>${item.name}</h4>
-        <p><strong>Type:</strong> ${item.level ? `Level ${item.level}`: item.ability || item.type || 'N/A'}</p>
+        <p><strong>Type:</strong> ${item.level ? `Level ${item.level}` : item.ability || item.type || 'N/A'}</p>
         <p>${item.description}</p>
         `;
         div.onclick = () => {
@@ -903,3 +898,4 @@ document.addEventListener('keydown', function(e) {
         deleteItem(selectedItem);
     }
 });
+
