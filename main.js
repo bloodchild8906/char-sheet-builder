@@ -1,4 +1,4 @@
-'// === CONFIGURABLE CONSTANTS (Default Values) ===
+// === CONFIGURABLE CONSTANTS (Default Values) ===
 let DEFAULT_FONTS = "'JetBrains Mono', 'Consolas', 'Monaco', 'Courier New', monospace";
 let LABELS = {
     'text-input': 'Text Input:',
@@ -326,7 +326,9 @@ function findDropTarget(element) {
         element = element.parentElement;
     }
     return null;
-}// Component Creation
+}
+
+// Component Creation
 function createComponent(type, container) {
     const id = 'item_' + (++componentCounter);
     const placeholder = container.querySelector('.canvas-placeholder, .container-placeholder');
@@ -479,6 +481,7 @@ function setupContainerDragDrop(container) {
         }
     });
 }
+
 function setupInputListeners(element) {
     const inputs = element.querySelectorAll('[data-json-path]');
     inputs.forEach(input => {
@@ -685,7 +688,8 @@ function showItemProperties(item) {
         case 'calculated':
             html += `
             <div><label>Label:</label><input type="text" value="${item.querySelector('label')?.textContent || ''}" onchange="updateItemProperty('label', this.value)"></div>
-            <div><label>Rules:</label><textarea rows="4" onchange="updateItemProperty('rules', this.value)" placeholder="sum([field1],[field2])&#10;[strength] + [dexterity]">${item.querySelector('[data-rules]')?.dataset.rules || ''}</textarea></div>
+            <div><label>Rules:</label><textarea rows="4" onchange="updateItemProperty('rules', this.value)" placeholder="sum([field1],[field2])
+[strength] + [dexterity]">${item.querySelector('[data-rules]')?.dataset.rules || ''}</textarea></div>
             `;
             break;
         case 'dice-button':
@@ -898,4 +902,3 @@ document.addEventListener('keydown', function(e) {
         deleteItem(selectedItem);
     }
 });
-
