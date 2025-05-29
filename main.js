@@ -684,14 +684,6 @@ class AppState {
         });
         return notification;
     }
-        // ===================================================================
-// main.js (PART 4/4) - [CONTINUATION AND TOP-LEVEL FUNCTIONS]
-// ===================================================================
-
-// Top-level utility functions, event handlers, and initialization
-// Only a small sample is shown here; for a full file, include all your logic as in your current main.js.
-
-// Utility: Debounce
 function debounce(func, wait, immediate = false) {
     let timeout;
     return function executedFunction(...args) {
@@ -770,7 +762,21 @@ window.TTRPGBuilder = {
     showNotification: (msg, type) => window.showNotification(msg, type),
     sanitizeHTML: html => window.appState ? appState.sanitizeHTML(html) : html,
 };
-
+window.switchPanel = function(panel) {
+    // Hide all panels
+    document.querySelectorAll('.panel-content').forEach(p => p.style.display = 'none');
+    // Remove active class from all icons
+    document.querySelectorAll('.activity-icon').forEach(icon => icon.classList.remove('active'));
+    // Show the selected panel
+    const selectedPanel = document.getElementById(`${panel}-panel`);
+    if (selectedPanel) selectedPanel.style.display = '';
+    // Set the sidebar title
+    const sidebarTitle = document.getElementById('sidebar-title');
+    if (sidebarTitle) sidebarTitle.textContent = panel.toUpperCase();
+    // Set the active icon
+    const activeIcon = document.querySelector(`.activity-icon[data-panel="${panel}"]`);
+    if (activeIcon) activeIcon.classList.add('active');
+};
 
     }
 
